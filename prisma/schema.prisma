@@ -1,0 +1,239 @@
+// Nabd Hospital — data model (Phase 1). This is the source of truth for the
+// database. Per CLAUDE.md §7 the schema is frozen after this phase; changing it
+// later requires explicit sign-off.
+//
+// Conventions:
+// - All DateTime instants are stored in UTC; the UI converts to Asia/Riyadh.
+// - Availability working hours are recurring wall-clock times (Riyadh), stored
+//   as "HH:mm" strings — they are not instants, so UTC does not apply.
+// - Doctors are DATA, not users: there is no relation from Doctor to User.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  // Connection URLs live in prisma.config.ts (Prisma 7). The runtime client
+  // connects via the pg driver adapter in src/lib/db.ts.
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum Role {
+  PATIENT
+  ADMIN
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum BloodType {
+  A_POS
+  A_NEG
+  B_POS
+  B_NEG
+  AB_POS
+  AB_NEG
+  O_POS
+  O_NEG
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum Actor {
+  PATIENT
+  ADMIN
+  SYSTEM
+}
+
+// ---------------------------------------------------------------------------
+// Identity
+// ---------------------------------------------------------------------------
+
+/// Auth identity only. Domain data for patients lives on Patient.
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String
+  fullName     String
+  phone        String
+  role         Role       @default(PATIENT)
+  createdAt    DateTime   @default(now())
+
+  patient   Patient?
+  newsPosts NewsPost[]
+
+  @@index([role])
+}
+
+/// One-to-one extension of a User with the PATIENT role.
+model Patient {
+  id          String     @id @default(cuid())
+  userId      String     @unique
+  fileNumber  String     @unique // human-readable, e.g. NB-0001
+  nationalId  String     @unique
+  dateOfBirth DateTime
+  gender      Gender
+  bloodType   BloodType?
+  address     String?
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  appointments Appointment[]
+}
+
+// ---------------------------------------------------------------------------
+// Catalog
+// ---------------------------------------------------------------------------
+
+model Department {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  nameAr        String
+  descriptionAr String
+  icon          String // lucide-react icon name
+  sortOrder     Int      @default(0)
+  isActive      Boolean  @default(true)
+
+  doctors      Doctor[]
+  appointments Appointment[]
+
+  @@index([isActive, sortOrder])
+}
+
+/// Doctors are data, not users. No relation to User.
+model Doctor {
+  id                   String  @id @default(cuid())
+  slug                 String  @unique
+  fullNameAr           String
+  title                String // e.g. استشاري
+  departmentId         String
+  bio                  String
+  photoUrl             String?
+  yearsExperience      Int     @default(0)
+  isAcceptingPatients  Boolean @default(true)
+
+  department   Department     @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+  availability Availability[]
+  timeOff      TimeOff[]
+  appointments Appointment[]
+
+  @@index([departmentId])
+}
+
+/// A doctor's recurring weekly working hours.
+model Availability {
+  id          String @id @default(cuid())
+  doctorId    String
+  dayOfWeek   Int // 0 = Sunday .. 6 = Saturday
+  startTime   String // "HH:mm" Riyadh wall-clock
+  endTime     String // "HH:mm" Riyadh wall-clock
+  slotMinutes Int    @default(30)
+
+  doctor Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@unique([doctorId, dayOfWeek, startTime])
+  @@index([doctorId, dayOfWeek])
+}
+
+/// One-off blocks (leave, conference) that remove slots from generation.
+model TimeOff {
+  id       String   @id @default(cuid())
+  doctorId String
+  startsAt DateTime // UTC
+  endsAt   DateTime // UTC
+  reason   String?
+
+  doctor Doctor @relation(fields: [doctorId], references: [id], onDelete: Cascade)
+
+  @@index([doctorId, startsAt])
+}
+
+// ---------------------------------------------------------------------------
+// Appointments
+// ---------------------------------------------------------------------------
+
+model Appointment {
+  id           String            @id @default(cuid())
+  patientId    String
+  doctorId     String
+  departmentId String
+  startsAt     DateTime // UTC
+  endsAt       DateTime // UTC
+  status       AppointmentStatus @default(PENDING)
+  reasonAr     String?
+  notesAr      String?
+  createdAt    DateTime          @default(now())
+  cancelledAt  DateTime?
+  cancelledBy  Actor?
+
+  patient    Patient    @relation(fields: [patientId], references: [id], onDelete: Restrict)
+  doctor     Doctor     @relation(fields: [doctorId], references: [id], onDelete: Restrict)
+  department Department @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+
+  // NOTE: the rule "one active appointment per doctor per slot" is enforced by a
+  // PARTIAL UNIQUE INDEX added in the migration SQL (Prisma cannot express a
+  // WHERE clause on an index). See prisma/migrations/*/migration.sql:
+  //   CREATE UNIQUE INDEX appointment_no_double_booking
+  //   ON "Appointment" ("doctorId", "startsAt")
+  //   WHERE status IN ('PENDING', 'CONFIRMED');
+  @@index([doctorId, startsAt])
+  @@index([patientId])
+  @@index([departmentId, startsAt])
+  @@index([status])
+  @@index([startsAt])
+}
+
+// ---------------------------------------------------------------------------
+// Content
+// ---------------------------------------------------------------------------
+
+model NewsPost {
+  id          String    @id @default(cuid())
+  slug        String    @unique
+  titleAr     String
+  excerptAr   String
+  bodyAr      String
+  coverUrl    String?
+  publishedAt DateTime? // null = draft
+  authorId    String
+  createdAt   DateTime  @default(now())
+
+  author User @relation(fields: [authorId], references: [id], onDelete: Restrict)
+
+  @@index([publishedAt])
+}
+
+model Faq {
+  id          String  @id @default(cuid())
+  questionAr  String
+  answerAr    String
+  category    String
+  sortOrder   Int     @default(0)
+  isPublished Boolean @default(true)
+
+  @@index([category, sortOrder])
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  fullName  String
+  email     String
+  phone     String
+  subjectAr String
+  bodyAr    String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([isRead, createdAt])
+}
