@@ -1,0 +1,157 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/* ============================================================================
+   Nabd Hospital — design tokens (CLAUDE.md §4). This is the whole palette.
+   Do not add colors that are not defined here.
+   ============================================================================ */
+
+:root {
+  /* Brand palette — 5 values, use no others. */
+  --ink: #10201f; /* text; near-black with a green cast, never pure #000 */
+  --paper: #f4f6f5; /* page background; cool clinical off-white */
+  --teal: #0e5a52; /* primary: buttons, links, active nav, confirmed state */
+  --mint: #dcede9; /* primary tint: badges, selected slots, table hover */
+  --pulse: #ff4d3d; /* BRAND GRAPHIC ONLY — ECG trace + logo mark. Never a UI state. */
+
+  /* Derived neutrals — the only two allowed. */
+  --muted-ink: color-mix(in srgb, var(--ink) 60%, var(--paper)); /* --ink at 60% */
+  --line: #e3e9e7; /* borders */
+
+  /* Status colors — functional, separate from brand. */
+  --st-pending: #b45309; /* بانتظار التأكيد */
+  --st-confirmed: #0e5a52; /* مؤكد */
+  --st-completed: #475569; /* مكتمل */
+  --st-cancelled: #9f1239; /* ملغي */
+  --st-noshow: #7c2d12; /* لم يحضر */
+
+  /* Single shadow (CLAUDE.md §4). Shadows are for overlays; borders do the rest. */
+  --shadow-clinical:
+    0 1px 2px rgb(16 32 31 / 0.06), 0 8px 24px -12px rgb(16 32 31 / 0.12);
+
+  /* shadcn/ui semantic tokens mapped onto the Nabd palette so any primitive
+     added in later phases inherits the clinical look automatically. */
+  --radius: 0.625rem; /* 10px cards */
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: #ffffff;
+  --card-foreground: var(--ink);
+  --popover: #ffffff;
+  --popover-foreground: var(--ink);
+  --primary: var(--teal);
+  --primary-foreground: var(--paper);
+  --secondary: var(--mint);
+  --secondary-foreground: var(--ink);
+  --muted: var(--mint);
+  --muted-foreground: var(--muted-ink);
+  --accent: var(--mint);
+  --accent-foreground: var(--ink);
+  --destructive: var(--st-cancelled); /* never --pulse */
+  --destructive-foreground: #ffffff;
+  --border: var(--line);
+  --input: var(--line);
+  --ring: var(--teal);
+}
+
+@theme inline {
+  /* Fonts — self-hosted IBM Plex via next/font/local (exposed app-wide as
+     --font-sans / --font-mono). */
+  --font-sans: var(--font-plex-sans), system-ui, sans-serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
+
+  /* Brand + neutral colors as Tailwind utilities (bg-teal, text-ink, ...). */
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-teal: var(--teal);
+  --color-mint: var(--mint);
+  --color-pulse: var(--pulse);
+  --color-muted-ink: var(--muted-ink);
+  --color-line: var(--line);
+
+  /* Status utilities (text-st-pending, bg-st-confirmed, ...). */
+  --color-st-pending: var(--st-pending);
+  --color-st-confirmed: var(--st-confirmed);
+  --color-st-completed: var(--st-completed);
+  --color-st-cancelled: var(--st-cancelled);
+  --color-st-noshow: var(--st-noshow);
+
+  /* shadcn semantic colors. */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  /* Radii — 10px cards, 8px inputs, 4px badges. */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+
+  /* Type scale — 12 / 14 / 16 / 20 / 24 / 32 / 44. */
+  --text-xs: 0.75rem; /* 12 */
+  --text-sm: 0.875rem; /* 14 */
+  --text-base: 1rem; /* 16 */
+  --text-lg: 1.25rem; /* 20 */
+  --text-xl: 1.5rem; /* 24 */
+  --text-2xl: 2rem; /* 32 */
+  --text-3xl: 2.75rem; /* 44 */
+
+  /* The one shadow. */
+  --shadow-clinical: var(--shadow-clinical);
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    font-size: var(--text-base);
+    line-height: 1.75; /* Arabic needs the leading */
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Every number that is data renders in IBM Plex Mono with tabular figures. */
+  .font-data {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Focus is always the teal ring (CLAUDE.md §6 / Phase 6). */
+  :focus-visible {
+    outline: 2px solid var(--teal);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
