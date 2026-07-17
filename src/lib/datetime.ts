@@ -44,6 +44,13 @@ export function isoDate(instant: Date): string {
   return formatInTimeZone(instant, RIYADH, "yyyy-MM-dd", { locale: arLocale });
 }
 
+/** "20/7" — compact day/month for a "YYYY-MM-DD" date (chart axes). */
+export function formatDayMonth(date: string): string {
+  const [y, m, d] = date.split("-").map(Number);
+  const noon = new Date(Date.UTC(y, m - 1, d, 9, 0));
+  return formatInTimeZone(noon, RIYADH, "d/M", { locale: arLocale });
+}
+
 /** "الأحد 20 يوليو" — weekday + day + month for a "YYYY-MM-DD" clinic date. */
 export function formatClinicDay(date: string): string {
   const [y, m, d] = date.split("-").map(Number);

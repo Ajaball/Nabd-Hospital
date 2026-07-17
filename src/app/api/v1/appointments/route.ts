@@ -18,7 +18,8 @@ import { ar } from "@/content/ar";
 
 export async function POST(request: Request) {
   const session = await auth();
-  if (!session?.user || session.user.role !== "PATIENT") {
+  const role = session?.user?.role;
+  if (!session?.user || (role !== "PATIENT" && role !== "ADMIN")) {
     return NextResponse.json(
       { error: "UNAUTHORIZED", message: ar.booking.errors.auth },
       { status: 401 },
@@ -39,12 +40,21 @@ export async function POST(request: Request) {
       { status: 422 },
     );
   }
-  const { doctorId, startsAt, reasonAr } = parsed.data;
+  const { doctorId, startsAt, reasonAr, patientId } = parsed.data;
 
-  const patient = await prisma.patient.findUnique({
-    where: { userId: session.user.id },
-    select: { id: true, fileNumber: true },
-  });
+  // Patients book for themselves; an admin walk-in books for a named patient.
+  const patient =
+    role === "ADMIN"
+      ? patientId
+        ? await prisma.patient.findUnique({
+            where: { id: patientId },
+            select: { id: true, fileNumber: true },
+          })
+        : null
+      : await prisma.patient.findUnique({
+          where: { userId: session.user.id },
+          select: { id: true, fileNumber: true },
+        });
   if (!patient) {
     return NextResponse.json({ error: "NO_PATIENT" }, { status: 403 });
   }
