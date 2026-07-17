@@ -95,6 +95,26 @@ describe("generateSlots", () => {
     expect(nineThirty?.isAvailable).toBe(true);
   });
 
+  it("returns no slots when the doctor has no availability windows", () => {
+    expect(generateSlots({ ...base(), availability: [] })).toHaveLength(0);
+  });
+
+  it("treats a slot exactly 2 hours out as available (boundary)", () => {
+    // 08:00 Riyadh = 05:00 UTC; now = 06:00 UTC makes it exactly 2h out.
+    const now = new Date("2026-07-19T03:00:00.000Z");
+    const [first] = generateSlots({ ...base(), now });
+    expect(first.startsAt.toISOString()).toBe("2026-07-19T05:00:00.000Z");
+    expect(first.isAvailable).toBe(true);
+  });
+
+  it("skips a window with a non-positive slot length", () => {
+    const slots = generateSlots({
+      ...base(),
+      availability: [{ ...sundayMorning, slotMinutes: 0 }],
+    });
+    expect(slots).toHaveLength(0);
+  });
+
   it("removes slots overlapping a time-off block", () => {
     // Time off 09:00–10:00 Riyadh (06:00–07:00 UTC) blocks the 09:00 & 09:30 slots.
     const slots = generateSlots({
