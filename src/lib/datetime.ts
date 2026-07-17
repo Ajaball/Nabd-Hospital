@@ -44,6 +44,39 @@ export function isoDate(instant: Date): string {
   return formatInTimeZone(instant, RIYADH, "yyyy-MM-dd", { locale: arLocale });
 }
 
+/** "الأحد 20 يوليو" — weekday + day + month for a "YYYY-MM-DD" clinic date. */
+export function formatClinicDay(date: string): string {
+  const [y, m, d] = date.split("-").map(Number);
+  // Noon Riyadh (09:00 UTC) sits safely inside the day regardless of offset.
+  const noon = new Date(Date.UTC(y, m - 1, d, 9, 0));
+  return formatInTimeZone(noon, RIYADH, "EEEE d MMMM", { locale: arLocale });
+}
+
+/** "YYYY-MM-DD" for a UTC-midnight instant of a calendar date. */
+function ymd(utcMidnightMs: number): string {
+  const dt = new Date(utcMidnightMs);
+  const y = dt.getUTCFullYear();
+  const m = String(dt.getUTCMonth() + 1).padStart(2, "0");
+  const d = String(dt.getUTCDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
+/**
+ * The next `count` clinic days (Sunday–Thursday) as "YYYY-MM-DD", starting from
+ * the Riyadh calendar date of `from`. Weekend days (Fri/Sat) are skipped.
+ */
+export function listClinicDays(from: Date, count: number): string[] {
+  const [y, m, d] = isoDate(from).split("-").map(Number);
+  let cursorMs = Date.UTC(y, m - 1, d);
+  const days: string[] = [];
+  while (days.length < count) {
+    const weekday = new Date(cursorMs).getUTCDay(); // 0 = Sun .. 6 = Sat
+    if (weekday >= 0 && weekday <= 4) days.push(ymd(cursorMs));
+    cursorMs += 24 * 60 * 60 * 1000;
+  }
+  return days;
+}
+
 /** Whole years elapsed since a founding year, by the Riyadh calendar. */
 export function yearsSince(foundedYear: number): number {
   const currentYear = Number(
