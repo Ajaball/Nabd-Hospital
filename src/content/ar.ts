@@ -199,11 +199,105 @@ export const ar = {
     rights: "جميع الحقوق محفوظة لمستشفى نبض.",
   },
 
+  auth: {
+    signOut: "تسجيل الخروج",
+    login: {
+      title: "تسجيل الدخول",
+      subtitle: "ادخل إلى حسابك لمتابعة مواعيدك وحجوزاتك.",
+      emailLabel: "البريد الإلكتروني",
+      passwordLabel: "كلمة المرور",
+      submit: "تسجيل الدخول",
+      submitting: "جارٍ التحقق…",
+      noAccount: "ليس لديك حساب؟",
+      registerCta: "أنشئ حسابًا",
+    },
+    register: {
+      title: "إنشاء حساب",
+      subtitle: "سجّل بياناتك مرة واحدة لتحجز مواعيدك وتتابعها بسهولة.",
+      fields: {
+        fullName: "الاسم الكامل",
+        email: "البريد الإلكتروني",
+        phone: "رقم الجوال",
+        nationalId: "رقم الهوية",
+        dateOfBirth: "تاريخ الميلاد",
+        gender: "الجنس",
+        password: "كلمة المرور",
+      },
+      placeholders: {
+        fullName: "مثال: محمد العتيبي",
+        email: "name@example.com",
+        phone: "05XXXXXXXX",
+        nationalId: "١٠ أرقام",
+        password: "8 أحرف على الأقل",
+      },
+      genderMale: "ذكر",
+      genderFemale: "أنثى",
+      submit: "إنشاء الحساب",
+      submitting: "جارٍ الإنشاء…",
+      haveAccount: "لديك حساب بالفعل؟",
+      loginCta: "سجّل الدخول",
+      passwordHint: "استخدم 8 أحرف على الأقل.",
+    },
+    adminLogin: {
+      title: "دخول الإدارة",
+      subtitle: "بوابة موظفي مستشفى نبض. الدخول مخصّص للحسابات الإدارية.",
+      emailLabel: "البريد الإلكتروني",
+      passwordLabel: "كلمة المرور",
+      submit: "دخول لوحة التحكم",
+      submitting: "جارٍ التحقق…",
+    },
+    errors: {
+      fullNameShort: "أدخل الاسم الكامل (حرفان على الأقل).",
+      fullNameLong: "الاسم طويل جدًا.",
+      email: "أدخل بريدًا إلكترونيًا صحيحًا.",
+      phone: "أدخل رقم جوال سعودي صحيح (يبدأ بـ 05 أو +9665).",
+      nationalId: "رقم الهوية يجب أن يتكوّن من 10 أرقام.",
+      password: "كلمة المرور يجب ألا تقل عن 8 أحرف.",
+      dateOfBirth: "أدخل تاريخ ميلاد صحيح.",
+      dateOfBirthFuture: "تاريخ الميلاد يجب أن يكون في الماضي.",
+      gender: "اختر الجنس.",
+      credentials: "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
+      rateLimited: "محاولات كثيرة. انتظر دقيقة ثم أعد المحاولة.",
+      emailTaken: "هذا البريد الإلكتروني مسجّل بالفعل. سجّل الدخول بدلًا من ذلك.",
+      generic: "تعذّر إتمام الطلب. حاول مرة أخرى.",
+    },
+    // Minimal authenticated placeholders; the full screens arrive in later phases.
+    patientHome: {
+      title: "مواعيدي",
+      placeholder: "ستظهر هنا مواعيدك القادمة والسابقة بعد بناء نظام الحجز.",
+    },
+    adminHome: {
+      title: "لوحة التحكم",
+      welcome: (name: string) => `مرحبًا، ${name}.`,
+      placeholder: "لوحة المؤشرات والإدارة قيد الإنشاء في المرحلة القادمة.",
+    },
+  },
+
   metadata: {
     home: {
       title: "مستشفى نبض",
       description:
         "مستشفى نبض — رعاية صحية موثوقة ومواعيد تحجزها في دقائق مع نخبة من الأطباء.",
+    },
+    login: {
+      title: "تسجيل الدخول",
+      description: "سجّل الدخول إلى حسابك في مستشفى نبض لإدارة مواعيدك.",
+    },
+    register: {
+      title: "إنشاء حساب",
+      description: "أنشئ حسابًا في مستشفى نبض لحجز المواعيد ومتابعتها.",
+    },
+    adminLogin: {
+      title: "دخول الإدارة",
+      description: "بوابة دخول موظفي وإدارة مستشفى نبض.",
+    },
+    dashboard: {
+      title: "لوحة التحكم",
+      description: "لوحة تحكم إدارة مستشفى نبض.",
+    },
+    myAppointments: {
+      title: "مواعيدي",
+      description: "مواعيدك القادمة والسابقة في مستشفى نبض.",
     },
     about: {
       title: "عن المستشفى",
