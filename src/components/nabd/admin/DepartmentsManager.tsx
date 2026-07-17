@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronUp, ChevronDown } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -47,8 +48,11 @@ export function DepartmentsManager({ departments }: { departments: DeptRow[] }) 
         body: JSON.stringify(body),
       });
       if (res.ok) {
+        toast.success(ar.toasts.departmentUpdated);
         setEditing(null);
         router.refresh();
+      } else {
+        toast.error(ar.toasts.genericError);
       }
     } finally {
       setBusy(false);

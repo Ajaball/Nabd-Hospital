@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CalendarClock } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -66,11 +67,14 @@ export function DoctorsManager({
         body: body ? JSON.stringify(body) : undefined,
       });
       if (res.ok) {
+        toast.success(ar.toasts.doctorUpdated);
         setEditing(null);
         router.refresh();
       } else {
         const data = await res.json().catch(() => ({}));
-        setError(data.message ?? ar.admin.common.genericError);
+        const message = data.message ?? ar.admin.common.genericError;
+        setError(message);
+        toast.error(message);
       }
     } finally {
       setBusy(false);

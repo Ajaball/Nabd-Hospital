@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { CheckCircle2 } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,8 +49,10 @@ export function ContactForm() {
       if (!res.ok) throw new Error("request failed");
       reset();
       setStatus("success");
+      toast.success(ar.toasts.messageSent);
     } catch {
       setStatus("error");
+      toast.error(ar.toasts.genericError);
     }
   }
 

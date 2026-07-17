@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { AppointmentStatus } from "@prisma/client";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { ar } from "@/content/ar";
@@ -43,7 +44,12 @@ export function AppointmentRowActions({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action }),
       });
-      if (res.ok) router.refresh();
+      if (res.ok) {
+        toast.success(ar.toasts.appointmentUpdated);
+        router.refresh();
+      } else {
+        toast.error(ar.toasts.genericError);
+      }
     } finally {
       setBusy(null);
     }

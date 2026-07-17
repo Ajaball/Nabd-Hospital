@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Printer, CalendarCheck } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -140,20 +141,24 @@ export function BookingDateTime({
       if (res.status === 201) {
         const data = await res.json();
         setSuccess(data.appointment as Success);
+        toast.success(ar.toasts.appointmentBooked);
         return;
       }
       if (res.status === 409) {
         setErrorMsg(ar.booking.errors.slotTaken);
         setStatus("error");
         setSelected(null);
+        toast.error(ar.booking.errors.slotTaken);
         void fetchSlots(date);
         return;
       }
       setErrorMsg(ar.booking.errors.invalid);
       setStatus("error");
+      toast.error(ar.booking.errors.invalid);
     } catch {
       setErrorMsg(ar.booking.errors.invalid);
       setStatus("error");
+      toast.error(ar.booking.errors.invalid);
     }
   }
 
@@ -259,15 +264,21 @@ export function BookingDateTime({
               const isSelected = slot.startsAt === selected;
               const label = formatTime(new Date(slot.startsAt));
               if (!slot.isAvailable) {
+                const reasonText = slot.reason
+                  ? ar.booking.slotReasons[slot.reason]
+                  : "";
                 return (
                   <button
                     key={slot.startsAt}
                     type="button"
                     disabled
-                    title={slot.reason ? ar.booking.slotReasons[slot.reason] : undefined}
+                    aria-label={`${label} — ${reasonText}`}
+                    title={reasonText || undefined}
                     className="flex h-11 cursor-not-allowed flex-col items-center justify-center rounded-md border border-line bg-mint/20 text-muted-ink/60 line-through"
                   >
-                    <span className="font-data text-sm">{label}</span>
+                    <span className="font-data text-sm" aria-hidden="true">
+                      {label}
+                    </span>
                   </button>
                 );
               }

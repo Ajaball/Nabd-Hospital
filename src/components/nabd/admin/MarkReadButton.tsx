@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { ar } from "@/content/ar";
@@ -18,7 +19,12 @@ export function MarkReadButton({ id }: { id: string }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ isRead: true }),
       });
-      if (res.ok) router.refresh();
+      if (res.ok) {
+        toast.success(ar.toasts.messageRead);
+        router.refresh();
+      } else {
+        toast.error(ar.toasts.genericError);
+      }
     } finally {
       setBusy(false);
     }

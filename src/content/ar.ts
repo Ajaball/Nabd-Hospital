@@ -359,6 +359,36 @@ export const ar = {
     cannotCancel: "لا يمكن إلغاء هذا الموعد.",
   },
 
+  system: {
+    loading: "جارٍ التحميل…",
+    notFoundTitle: "الصفحة غير موجودة",
+    notFoundBody:
+      "تعذّر العثور على الصفحة المطلوبة. قد يكون الرابط قديمًا أو غير صحيح.",
+    backHome: "العودة إلى الرئيسية",
+    errorTitle: "حدث خطأ غير متوقع",
+    errorBody:
+      "واجهنا مشكلة أثناء تحميل هذه الصفحة. حاول مرة أخرى، وإن تكرّر الأمر فتواصل معنا.",
+    retry: "إعادة المحاولة",
+  },
+
+  toasts: {
+    appointmentBooked: "تم حجز الموعد.",
+    appointmentCancelled: "تم إلغاء الموعد.",
+    appointmentUpdated: "تم تحديث حالة الموعد.",
+    messageSent: "تم إرسال الرسالة.",
+    messageRead: "تم تعليم الرسالة كمقروءة.",
+    departmentUpdated: "تم تحديث القسم.",
+    departmentCreated: "تمت إضافة القسم.",
+    doctorUpdated: "تم تحديث الطبيب.",
+    doctorCreated: "تمت إضافة الطبيب.",
+    doctorDeleted: "تم حذف الطبيب.",
+    availabilitySaved: "تم حفظ أوقات العمل.",
+    newsCreated: "تمت إضافة الخبر.",
+    newsUpdated: "تم تحديث الخبر.",
+    newsDeleted: "تم حذف الخبر.",
+    genericError: "تعذّر إتمام العملية. حاول مرة أخرى.",
+  },
+
   admin: {
     nav: {
       overview: "نظرة عامة",

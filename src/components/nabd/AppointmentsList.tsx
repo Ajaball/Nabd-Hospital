@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import type { AppointmentStatus } from "@prisma/client";
 import { CalendarClock } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/nabd/StatusBadge";
@@ -87,11 +88,16 @@ function AppointmentCard({
   const router = useRouter();
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Optimistic: show the appointment cancelled immediately, roll back on failure.
+  const [optimisticCancelled, setOptimisticCancelled] = useState(false);
+
+  const status: AppointmentStatus = optimisticCancelled ? "CANCELLED" : item.status;
+  const showCancel = cancellable && item.canCancel && !optimisticCancelled;
 
   async function cancel() {
     setBusy(true);
-    setError(null);
+    setConfirming(false);
+    setOptimisticCancelled(true);
     try {
       const res = await fetch(`/api/v1/appointments/${item.id}`, {
         method: "PATCH",
@@ -99,10 +105,11 @@ function AppointmentCard({
         body: JSON.stringify({ action: "cancel" }),
       });
       if (!res.ok) throw new Error("failed");
-      setConfirming(false);
+      toast.success(ar.toasts.appointmentCancelled);
       router.refresh();
     } catch {
-      setError(ar.appointments.cancelError);
+      setOptimisticCancelled(false); // rollback
+      toast.error(ar.appointments.cancelError);
     } finally {
       setBusy(false);
     }
@@ -117,7 +124,7 @@ function AppointmentCard({
             {item.doctorTitle} · {item.departmentNameAr}
           </p>
         </div>
-        <StatusBadge status={item.status} />
+        <StatusBadge status={status} />
       </div>
 
       <dl className="mt-4 grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
@@ -141,16 +148,11 @@ function AppointmentCard({
         ) : null}
       </dl>
 
-      {cancellable && item.canCancel ? (
+      {showCancel ? (
         <div className="mt-4 border-t border-line pt-4">
           {confirming ? (
             <div className="space-y-3">
               <p className="text-sm text-ink">{ar.appointments.cancelBody}</p>
-              {error ? (
-                <p role="alert" className="text-sm text-destructive">
-                  {error}
-                </p>
-              ) : null}
               <div className="flex flex-wrap gap-2">
                 <Button
                   variant="destructive"
