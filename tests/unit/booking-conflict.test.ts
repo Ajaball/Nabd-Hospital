@@ -87,7 +87,8 @@ beforeAll(async () => {
     user: { id: userId, role: "PATIENT", name: "مريض اختبار", email: `${tag}@example.com` },
     expires: "2099-01-01T00:00:00.000Z",
   };
-  vi.mocked(auth).mockResolvedValue(session);
+  // `auth` is an overloaded export; cast the mock to a simple resolver.
+  (auth as unknown as ReturnType<typeof vi.fn>).mockResolvedValue(session);
 });
 
 afterAll(async () => {

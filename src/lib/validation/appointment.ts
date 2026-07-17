@@ -2,8 +2,8 @@ import { z } from "zod";
 
 /**
  * Appointment boundary schemas (CLAUDE.md §2.7). The dedicated messages here
- * are developer-facing (the client never shows raw slot errors — it maps codes
- * to ar.ts), so plain English is fine for these few.
+ * are developer-facing (the client maps codes to ar.ts), so plain English is
+ * fine for these few.
  */
 
 export const dateParamSchema = z
@@ -17,11 +17,17 @@ export const createAppointmentSchema = z.object({
     .string()
     .refine((s) => !Number.isNaN(Date.parse(s)), "startsAt must be an ISO datetime"),
   reasonAr: z.string().trim().max(500).optional(),
+  // Admin walk-in booking targets a specific patient; patients omit this and
+  // book for themselves (the server ignores it for the PATIENT role).
+  patientId: z.string().min(1).optional(),
 });
 
 export type CreateAppointmentInput = z.infer<typeof createAppointmentSchema>;
 
-// PATCH body: the only patient-initiated transition is cancellation.
-export const cancelAppointmentSchema = z.object({
-  action: z.literal("cancel"),
+// PATCH transitions. A patient may only "cancel"; an admin may also confirm,
+// complete, or mark no-show. The route enforces which role may do which.
+export const updateAppointmentSchema = z.object({
+  action: z.enum(["cancel", "confirm", "complete", "no_show"]),
 });
+
+export type UpdateAppointmentInput = z.infer<typeof updateAppointmentSchema>;

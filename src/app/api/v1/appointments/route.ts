@@ -22,14 +22,6 @@ export async function POST(request: Request) {
     return fail(ar.errors.unauthorized, 401, { code: "UNAUTHENTICATED" });
   }
 
-  const patient = await prisma.patient.findUnique({
-    where: { userId: session.user.id },
-    select: { id: true },
-  });
-  if (!patient) {
-    return fail(ar.errors.forbidden, 403, { code: "NOT_A_PATIENT" });
-  }
-
   let body: unknown;
   try {
     body = await request.json();
@@ -42,6 +34,30 @@ export async function POST(request: Request) {
     return validationError(parsed.error, ar.errors.badRequest);
   }
   const input = parsed.data;
+
+  // Resolve the target patient. Admins book a walk-in for a named patient;
+  // patients book for themselves (the client-supplied patientId is ignored).
+  let patient: { id: string } | null;
+  if (session.user.role === "ADMIN") {
+    if (!input.patientId) {
+      return fail(ar.errors.badRequest, 400, { code: "PATIENT_REQUIRED" });
+    }
+    patient = await prisma.patient.findUnique({
+      where: { id: input.patientId },
+      select: { id: true },
+    });
+    if (!patient) {
+      return fail(ar.errors.notFound, 404, { code: "PATIENT_NOT_FOUND" });
+    }
+  } else {
+    patient = await prisma.patient.findUnique({
+      where: { userId: session.user.id },
+      select: { id: true },
+    });
+    if (!patient) {
+      return fail(ar.errors.forbidden, 403, { code: "NOT_A_PATIENT" });
+    }
+  }
 
   const startsAt = new Date(input.startsAt);
   const now = new Date();

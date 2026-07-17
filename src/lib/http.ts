@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import type { z } from "zod";
 
 /**
@@ -43,4 +44,18 @@ export function validationError(
     (fields[key] ??= []).push(issue.message);
   }
   return fail(message, 400, { code: "VALIDATION_ERROR", fields });
+}
+
+/** P2002 — a unique constraint (e.g. slug) was violated. */
+export function isUniqueViolation(error: unknown): boolean {
+  return (
+    error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002"
+  );
+}
+
+/** P2003 — a foreign-key/restrict constraint blocked the write (e.g. delete). */
+export function isForeignKeyViolation(error: unknown): boolean {
+  return (
+    error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2003"
+  );
 }
