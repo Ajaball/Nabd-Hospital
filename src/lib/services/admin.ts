@@ -146,6 +146,45 @@ export async function getRecentActivity(take = 8) {
   });
 }
 
+/** All departments (including inactive) with their doctor count, in order. */
+export async function listDepartmentsAdmin() {
+  return prisma.department.findMany({
+    orderBy: { sortOrder: "asc" },
+    include: { _count: { select: { doctors: true } } },
+  });
+}
+
+/** All doctors with department, experience, and future-appointment count. */
+export async function listDoctorsAdmin() {
+  const now = new Date();
+  const doctors = await prisma.doctor.findMany({
+    orderBy: [{ department: { sortOrder: "asc" } }, { fullNameAr: "asc" }],
+    include: {
+      department: { select: { nameAr: true } },
+      availability: {
+        orderBy: [{ dayOfWeek: "asc" }, { startTime: "asc" }],
+        select: { dayOfWeek: true, startTime: true, endTime: true, slotMinutes: true },
+      },
+      _count: {
+        select: {
+          appointments: {
+            where: {
+              startsAt: { gte: now },
+              status: { in: [AppointmentStatus.PENDING, AppointmentStatus.CONFIRMED] },
+            },
+          },
+        },
+      },
+    },
+  });
+  return doctors;
+}
+
+/** All news posts (drafts included), newest first. */
+export async function listNewsAdmin() {
+  return prisma.newsPost.findMany({ orderBy: { createdAt: "desc" } });
+}
+
 /** Contact inbox, unread first, then newest first. */
 export async function listMessages(page: number) {
   const p = Math.max(1, page);
