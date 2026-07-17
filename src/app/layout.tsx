@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { sansArabic, mono } from "./fonts";
+import { Toaster } from "@/components/ui/sonner";
 import { ar } from "@/content/ar";
 import "./globals.css";
 
@@ -18,7 +19,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ar" dir="rtl" className={`${sansArabic.variable} ${mono.variable}`}>
-      <body>{children}</body>
+      <body>
+        {children}
+        <Toaster />
+      </body>
     </html>
   );
 }
