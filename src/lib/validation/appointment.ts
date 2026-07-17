@@ -8,7 +8,16 @@ import { z } from "zod";
 
 export const dateParamSchema = z
   .string()
-  .regex(/^\d{4}-\d{2}-\d{2}$/, "date must be YYYY-MM-DD");
+  .regex(/^\d{4}-\d{2}-\d{2}$/, "date must be YYYY-MM-DD")
+  // Reject well-formed-but-impossible dates (e.g. 2026-13-45) so they never
+  // reach the slot query as an Invalid Date and surface as a 500.
+  .refine((s) => {
+    const [y, m, d] = s.split("-").map((n) => Number.parseInt(n, 10));
+    const dt = new Date(Date.UTC(y, m - 1, d));
+    return (
+      dt.getUTCFullYear() === y && dt.getUTCMonth() === m - 1 && dt.getUTCDate() === d
+    );
+  }, "date must be a real calendar date");
 
 export const createAppointmentSchema = z.object({
   doctorId: z.string().min(1),

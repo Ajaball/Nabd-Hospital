@@ -75,8 +75,15 @@ export async function POST(request: Request) {
     (s) => s.startsAt.getTime() === startsAt.getTime(),
   );
   // A slot must exist and be a legitimate bookable time. "booked" is allowed
-  // through so the DB index — not this pre-check — resolves the race.
-  if (!slot || (slot.reason && slot.reason !== "booked")) {
+  // through so the DB index — not this pre-check — resolves the race. Admins
+  // booking a walk-in may also take an imminent ("too_soon") slot; the 2-hour
+  // lead time only protects patient self-booking. "past" and "timeoff" are
+  // never bookable by anyone.
+  const bookableReasons =
+    session.user.role === "ADMIN"
+      ? new Set(["booked", "too_soon"])
+      : new Set(["booked"]);
+  if (!slot || (slot.reason && !bookableReasons.has(slot.reason))) {
     return fail(ar.booking.invalidSlot, 422, { code: "INVALID_SLOT" });
   }
 
