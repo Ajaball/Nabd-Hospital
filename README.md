@@ -72,15 +72,21 @@ pnpm dev                      # http://localhost:3000
 ## النشر (Deployment)
 
 - **قاعدة البيانات**: Neon Postgres مع تفعيل التجميع (pooling). اضبط `DATABASE_URL`
-  على الرابط المجمّع و`DIRECT_URL` على الرابط المباشر، ثم:
+  على الرابط المجمّع و`DIRECT_URL` على الرابط المباشر.
+
+- **الاستضافة**: Vercel. أضِف متغيرات البيئة نفسها (على Vercel لا حاجة لضبط
+  `AUTH_TRUST_HOST`). عند كل نشر يشغّل Vercel السكربت `vercel-build` الذي **يطبّق
+  الهجرات تلقائيًا** (`prisma migrate deploy`) قبل البناء، فلا حاجة لتطبيقها يدويًا.
+
+- **بيانات العرض**: تُملأ مرّة واحدة فقط (البذر ليس جزءًا من البناء). بعد أول نشر،
+  شغّلها محليًا مع `.env` موجّهٍ إلى `DIRECT_URL` الخاص بـ Neon:
 
   ```bash
-  pnpm db:deploy        # prisma migrate deploy
   pnpm db:seed
   ```
 
-- **الاستضافة**: Vercel. أضِف متغيرات البيئة نفسها. على Vercel لا حاجة لضبط
-  `AUTH_TRUST_HOST`. الدفع إلى الفرع الرئيسي ينشر تلقائيًا.
+> السكربت المحلي `pnpm build` يبقى `prisma generate && next build` بلا اتصال بقاعدة
+> بيانات؛ الهجرة التلقائية مقصورة على `vercel-build`.
 
 ## التوثيق (Documentation)
 
