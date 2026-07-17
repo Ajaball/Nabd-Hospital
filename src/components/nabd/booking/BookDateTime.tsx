@@ -237,11 +237,17 @@ export function BookDateTime({
         ) : (
           <div className="space-y-3">
             <p className="text-sm text-muted-ink">{ar.booking.loginRequired}</p>
-            <Button asChild size="lg" disabled={!slot}>
-              <Link href={`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`}>
+            {slot ? (
+              <Button asChild size="lg">
+                <Link href={`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`}>
+                  {ar.booking.loginCta}
+                </Link>
+              </Button>
+            ) : (
+              <Button size="lg" disabled>
                 {ar.booking.loginCta}
-              </Link>
-            </Button>
+              </Button>
+            )}
           </div>
         )}
       </div>

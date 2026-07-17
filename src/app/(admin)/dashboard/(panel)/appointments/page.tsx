@@ -170,12 +170,24 @@ export default async function AppointmentsPage({
             <span className="font-data tabular-nums">{totalPages}</span>
           </p>
           <div className="flex gap-2">
-            <Button asChild variant="outline" size="sm" disabled={page <= 1}>
-              <Link href={pageHref(Math.max(1, page - 1))}>{ar.common.back}</Link>
-            </Button>
-            <Button asChild variant="outline" size="sm" disabled={page >= totalPages}>
-              <Link href={pageHref(Math.min(totalPages, page + 1))}>{ar.booking.next}</Link>
-            </Button>
+            {page <= 1 ? (
+              <Button variant="outline" size="sm" disabled>
+                {ar.common.back}
+              </Button>
+            ) : (
+              <Button asChild variant="outline" size="sm">
+                <Link href={pageHref(page - 1)}>{ar.common.back}</Link>
+              </Button>
+            )}
+            {page >= totalPages ? (
+              <Button variant="outline" size="sm" disabled>
+                {ar.booking.next}
+              </Button>
+            ) : (
+              <Button asChild variant="outline" size="sm">
+                <Link href={pageHref(page + 1)}>{ar.booking.next}</Link>
+              </Button>
+            )}
           </div>
         </div>
       ) : null}
