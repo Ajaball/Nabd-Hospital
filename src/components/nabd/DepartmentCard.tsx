@@ -20,7 +20,7 @@ export function DepartmentCard({ slug, nameAr, descriptionAr, icon, doctorCount 
   return (
     <Link
       href={`/departments/${slug}`}
-      className="group flex h-full flex-col rounded-lg border border-line bg-card p-6 transition-colors hover:border-teal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
+      className="group flex h-full flex-col rounded-lg border border-line bg-card p-6 transition-[transform,box-shadow,border-color] duration-300 ease-out hover:-translate-y-1 hover:border-teal hover:shadow-clinical focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
     >
       <div className="flex items-center justify-between">
         <span className="flex size-12 items-center justify-center rounded-md bg-mint text-teal">

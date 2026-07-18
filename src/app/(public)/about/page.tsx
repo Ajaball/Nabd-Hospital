@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { PulseTrace } from "@/components/nabd/PulseTrace";
 import { SectionHeading } from "@/components/nabd/SectionHeading";
+import { CountUp } from "@/components/nabd/motion/CountUp";
 import { getHospitalStats } from "@/lib/queries";
 import { ar } from "@/content/ar";
 
@@ -49,7 +50,7 @@ export default async function AboutPage() {
                 className="rounded-lg border border-line bg-card p-6 text-center"
               >
                 <dd className="font-data text-3xl font-bold tabular-nums text-teal">
-                  {f.value}
+                  <CountUp value={f.value} />
                 </dd>
                 <dt className="mt-2 text-sm text-muted-ink">{f.label}</dt>
               </div>
