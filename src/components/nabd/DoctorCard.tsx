@@ -23,7 +23,7 @@ export function DoctorCard({
   return (
     <Link
       href={`/doctors/${slug}`}
-      className="group flex h-full flex-col rounded-lg border border-line bg-card p-6 transition-colors hover:border-teal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
+      className="group flex h-full flex-col rounded-lg border border-line bg-card p-6 transition-[transform,box-shadow,border-color] duration-300 ease-out hover:-translate-y-1 hover:border-teal hover:shadow-clinical focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal"
     >
       <div className="flex items-start gap-4">
         <span className="flex size-12 shrink-0 items-center justify-center rounded-full bg-mint text-teal">

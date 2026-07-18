@@ -136,6 +136,63 @@
   }
 }
 
+/* ============================================================================
+   «النبض الحيّ» — motion system (Phase: identity). Purposeful, quiet, and
+   reduced-motion-safe. The pulse is the one thing allowed to move boldly.
+   ============================================================================ */
+
+/* Logo mark: a subtle heartbeat. */
+@keyframes nb-heartbeat {
+  0%, 70%, 100% { transform: scale(1); }
+  8% { transform: scale(1.16); }
+  16% { transform: scale(1); }
+  24% { transform: scale(1.09); }
+  32% { transform: scale(1); }
+}
+
+/* Scroll reveal: content rises and fades in as it enters the viewport. */
+.nb-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.6s cubic-bezier(0.2, 0.7, 0.2, 1),
+    transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
+  will-change: opacity, transform;
+}
+.nb-reveal[data-in="true"] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Logo heartbeat + the ECG divider draw. */
+.nb-logo-mark {
+  transform-origin: center;
+  animation: nb-heartbeat 3.2s ease-in-out infinite;
+}
+.nb-pulse-draw {
+  stroke-dasharray: var(--len);
+  stroke-dashoffset: var(--len);
+  transition: stroke-dashoffset 1.1s ease-out;
+}
+.nb-pulse-draw[data-in="true"] {
+  stroke-dashoffset: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nb-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .nb-logo-mark {
+    animation: none !important;
+  }
+  .nb-pulse-draw {
+    stroke-dashoffset: 0 !important;
+    transition: none !important;
+  }
+}
+
 @layer base {
   * {
     border-color: var(--border);

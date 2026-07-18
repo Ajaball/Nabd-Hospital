@@ -26,7 +26,6 @@ export function AppointmentSlip({ data }: { data: SlipData }) {
   const start = new Date(data.startsAt);
 
   const rows = [
-    { label: ar.booking.slip.fileNumber, value: data.fileNumber, mono: true },
     { label: ar.booking.slip.doctor, value: data.doctorNameAr, mono: false },
     { label: ar.booking.slip.department, value: data.departmentNameAr, mono: false },
     { label: ar.booking.slip.date, value: formatDateWithWeekday(start), mono: true },
@@ -42,11 +41,13 @@ export function AppointmentSlip({ data }: { data: SlipData }) {
         </h2>
       </div>
 
-      <div className="rounded-sm border border-line bg-card p-6">
-        <h3 className="mb-4 text-sm font-semibold text-muted-ink">
-          {ar.booking.slip.title}
-        </h3>
-        <dl className="divide-y divide-line">
+      <div className="overflow-hidden rounded-sm border border-line bg-card shadow-clinical">
+        {/* Wristband band: the hospital + the file number (mono) */}
+        <div className="flex items-center justify-between gap-3 bg-teal px-5 py-3 text-paper">
+          <span className="text-sm font-semibold">{ar.site.name}</span>
+          <span className="font-data tracking-wider tabular-nums">{data.fileNumber}</span>
+        </div>
+        <dl className="divide-y divide-line px-5 pb-4 pt-1">
           {rows.map((row) => (
             <div key={row.label} className="flex items-center justify-between gap-4 py-2.5">
               <dt className="text-sm text-muted-ink">{row.label}</dt>

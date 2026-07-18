@@ -23,7 +23,11 @@ export function Logo({
       )}
       aria-label={ar.site.name}
     >
-      <Activity className="size-6 text-pulse" strokeWidth={2.5} aria-hidden="true" />
+      <Activity
+        className="nb-logo-mark size-6 text-pulse"
+        strokeWidth={2.5}
+        aria-hidden="true"
+      />
       {withText ? (
         <span className="text-lg font-bold tracking-[-0.01em] text-ink">
           {ar.site.name}
